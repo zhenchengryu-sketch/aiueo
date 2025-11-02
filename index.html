@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プレイヤー移動デモ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #1a1a2e;
+            overflow: hidden;
+        }
+        
+        canvas {
+            border: 2px solid #16213e;
+            background-color: #0f3460;
+        }
+        
+        .instructions {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">
+        <strong>操作方法:</strong><br>
+        <span style="color: #4CAF50;">プレイヤー1（緑）:</span><br>
+        ↑: 前に移動<br>
+        ↓: 後ろに移動<br>
+        ←: 左に旋回<br>
+        →: 右に旋回<br><br>
+        <span style="color: #FF5722;">プレイヤー2（オレンジ）:</span><br>
+        W: 前に移動<br>
+        S: 後ろに移動<br>
+        A: 左に旋回<br>
+        D: 右に旋回
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <script src="game.js"></script>
+</body>
+</html>
+
