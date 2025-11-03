@@ -30,7 +30,8 @@ const player1 = {
     x: canvas.width / 2 - 100,
     y: canvas.height / 2,
     angle: 0, // 角度（ラジアン）- 右を向く
-    speed: 3, // 移動速度
+    baseSpeed: 3, // 基本移動速度
+    speed: 3, // 現在の移動速度（描画面積によって変動）
     rotationSpeed: 0.05, // 回転速度（ラジアン）
     baseSize: 20, // 基本サイズ
     size: 20, // 現在のサイズ
@@ -46,7 +47,8 @@ const player2 = {
     x: canvas.width / 2 + 100,
     y: canvas.height / 2,
     angle: Math.PI, // 角度（ラジアン）- 左を向く
-    speed: 3, // 移動速度
+    baseSpeed: 3, // 基本移動速度
+    speed: 3, // 現在の移動速度（描画面積によって変動）
     rotationSpeed: 0.05, // 回転速度（ラジアン）
     baseSize: 20, // 基本サイズ
     size: 20, // 現在のサイズ
@@ -84,6 +86,9 @@ document.addEventListener('keydown', (e) => {
             gameState = 'player2Drawing';
         } else if (gameState === 'player2Drawing') {
             gameState = 'playing';
+            // ゲーム開始時に両プレイヤーの速度を描画面積に基づいて更新
+            updatePlayerSpeed(player1);
+            updatePlayerSpeed(player2);
         }
         e.preventDefault();
         return;
@@ -108,6 +113,41 @@ document.addEventListener('keyup', (e) => {
         e.preventDefault();
     }
 });
+
+// 描画の総面積（線の長さの合計）を計算
+function calculateDrawingArea(drawing) {
+    let totalLength = 0;
+    
+    for (const path of drawing) {
+        for (let i = 0; i < path.length - 1; i++) {
+            const dx = path[i + 1].x - path[i].x;
+            const dy = path[i + 1].y - path[i].y;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            totalLength += length;
+        }
+    }
+    
+    return totalLength;
+}
+
+// 描画面積に基づいて速度を調整
+function updatePlayerSpeed(playerObj) {
+    const drawingArea = calculateDrawingArea(playerObj.customDrawing);
+    
+    // 面積が0の場合は基本速度
+    if (drawingArea === 0) {
+        playerObj.speed = playerObj.baseSpeed;
+        return;
+    }
+    
+    // 面積に応じて速度を減少（面積が大きいほど遅くなる）
+    // 基準値: 200の面積で速度が半分になるように設定
+    const slowdownFactor = 1 / (1 + drawingArea / 200);
+    playerObj.speed = playerObj.baseSpeed * slowdownFactor;
+    
+    // 最低速度を設定（完全に止まらないように）
+    playerObj.speed = Math.max(0.5, playerObj.speed);
+}
 
 // 描画キャンバスの中心座標を計算
 function getDrawingCanvasCenter() {
@@ -185,6 +225,7 @@ function resetGame() {
     player1.x = canvas.width / 2 - 100;
     player1.y = canvas.height / 2;
     player1.angle = 0;
+    player1.speed = player1.baseSpeed;
     player1.size = player1.baseSize;
     player1.hasLeftField = false;
     player1.damageTimer = 0;
@@ -193,6 +234,7 @@ function resetGame() {
     player2.x = canvas.width / 2 + 100;
     player2.y = canvas.height / 2;
     player2.angle = Math.PI;
+    player2.speed = player2.baseSpeed;
     player2.size = player2.baseSize;
     player2.hasLeftField = false;
     player2.damageTimer = 0;
